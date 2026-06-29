@@ -1,0 +1,54 @@
+{
+  "level": "L3",
+  "week": 8,
+  "theme": "Native-like Fluency Patterns",
+  "phoneme_focus": "Native rhythm + reduction patterns",
+  "grammar_pattern": "Register & Formality Switching",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "TED_talk",
+      "prompt": "Give a 5-minute TED-style talk (Topic: Native-like Fluency Patterns)",
+      "target_seconds": 320
+    },
+    "Sunday": {
+      "type": "debate_advanced",
+      "prompt": "Structured debate with rebuttals (Topic: Native-like Fluency Patterns)",
+      "target_seconds": 320
+    },
+    "Monday": {
+      "type": "podcast",
+      "prompt": "Record a podcast segment (5 min) (Topic: Native-like Fluency Patterns)",
+      "target_seconds": 320
+    },
+    "Tuesday": {
+      "type": "teaching",
+      "prompt": "Teach a concept to a beginner (Topic: Native-like Fluency Patterns)",
+      "target_seconds": 320
+    },
+    "Wednesday": {
+      "type": "improvisation",
+      "prompt": "Respond to unexpected prompts (Topic: Native-like Fluency Patterns)",
+      "target_seconds": 320
+    },
+    "Thursday": {
+      "type": "accent_mimicry",
+      "prompt": "Mimic a native speaker clip perfectly (Topic: Native-like Fluency Patterns)",
+      "target_seconds": 320
+    },
+    "Friday": {
+      "type": "free_mastery",
+      "prompt": "Speak naturally for 5+ minutes on any topic (Topic: Native-like Fluency Patterns)",
+      "target_seconds": 320
+    }
+  },
+  "writing_prompts": [
+    "Write a persuasive essay on native-like fluency patterns (300+ words, use rhetorical devices).",
+    "Write a critical analysis of a trend in native-like fluency patterns.",
+    "Compose a formal report with recommendations about native-like fluency patterns.",
+    "Write a creative piece (story/poem) inspired by native-like fluency patterns.",
+    "Draft an opinion column for a newspaper about native-like fluency patterns.",
+    "Write a comparison essay using academic vocabulary about native-like fluency patterns.",
+    "Write freely about native-like fluency patterns — focus on style, not just content."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 3,
+  "theme": "Culture & Traditions",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Reported Speech (he said that...)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Culture & Traditions)",
+      "target_seconds": 210
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Culture & Traditions)",
+      "target_seconds": 210
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Culture & Traditions)",
+      "target_seconds": 210
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Culture & Traditions)",
+      "target_seconds": 210
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Culture & Traditions)",
+      "target_seconds": 210
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Culture & Traditions)",
+      "target_seconds": 210
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Culture & Traditions)",
+      "target_seconds": 210
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of culture & traditions.",
+    "Analyze the impact of culture & traditions on daily life.",
+    "Compare how culture & traditions differs between two countries.",
+    "Write a formal email about culture & traditions.",
+    "Describe a personal experience related to culture & traditions (200+ words).",
+    "What changes would you make regarding culture & traditions? Explain why.",
+    "Summarize an article about culture & traditions in your own words."
+  ]
+}

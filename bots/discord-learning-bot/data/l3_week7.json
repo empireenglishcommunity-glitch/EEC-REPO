@@ -1,0 +1,54 @@
+{
+  "level": "L3",
+  "week": 7,
+  "theme": "Advanced Pronunciation (Connected Speech)",
+  "phoneme_focus": "Native rhythm + reduction patterns",
+  "grammar_pattern": "Complex Noun Phrases",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "TED_talk",
+      "prompt": "Give a 5-minute TED-style talk (Topic: Advanced Pronunciation (Connected Speech))",
+      "target_seconds": 310
+    },
+    "Sunday": {
+      "type": "debate_advanced",
+      "prompt": "Structured debate with rebuttals (Topic: Advanced Pronunciation (Connected Speech))",
+      "target_seconds": 310
+    },
+    "Monday": {
+      "type": "podcast",
+      "prompt": "Record a podcast segment (5 min) (Topic: Advanced Pronunciation (Connected Speech))",
+      "target_seconds": 310
+    },
+    "Tuesday": {
+      "type": "teaching",
+      "prompt": "Teach a concept to a beginner (Topic: Advanced Pronunciation (Connected Speech))",
+      "target_seconds": 310
+    },
+    "Wednesday": {
+      "type": "improvisation",
+      "prompt": "Respond to unexpected prompts (Topic: Advanced Pronunciation (Connected Speech))",
+      "target_seconds": 310
+    },
+    "Thursday": {
+      "type": "accent_mimicry",
+      "prompt": "Mimic a native speaker clip perfectly (Topic: Advanced Pronunciation (Connected Speech))",
+      "target_seconds": 310
+    },
+    "Friday": {
+      "type": "free_mastery",
+      "prompt": "Speak naturally for 5+ minutes on any topic (Topic: Advanced Pronunciation (Connected Speech))",
+      "target_seconds": 310
+    }
+  },
+  "writing_prompts": [
+    "Write a persuasive essay on advanced pronunciation (connected speech) (300+ words, use rhetorical devices).",
+    "Write a critical analysis of a trend in advanced pronunciation (connected speech).",
+    "Compose a formal report with recommendations about advanced pronunciation (connected speech).",
+    "Write a creative piece (story/poem) inspired by advanced pronunciation (connected speech).",
+    "Draft an opinion column for a newspaper about advanced pronunciation (connected speech).",
+    "Write a comparison essay using academic vocabulary about advanced pronunciation (connected speech).",
+    "Write freely about advanced pronunciation (connected speech) — focus on style, not just content."
+  ]
+}

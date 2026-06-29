@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 11,
+  "theme": "Media & Journalism",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Participle Clauses (having done, being done)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Media & Journalism)",
+      "target_seconds": 290
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Media & Journalism)",
+      "target_seconds": 290
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Media & Journalism)",
+      "target_seconds": 290
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Media & Journalism)",
+      "target_seconds": 290
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Media & Journalism)",
+      "target_seconds": 290
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Media & Journalism)",
+      "target_seconds": 290
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Media & Journalism)",
+      "target_seconds": 290
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of media & journalism.",
+    "Analyze the impact of media & journalism on daily life.",
+    "Compare how media & journalism differs between two countries.",
+    "Write a formal email about media & journalism.",
+    "Describe a personal experience related to media & journalism (200+ words).",
+    "What changes would you make regarding media & journalism? Explain why.",
+    "Summarize an article about media & journalism in your own words."
+  ]
+}

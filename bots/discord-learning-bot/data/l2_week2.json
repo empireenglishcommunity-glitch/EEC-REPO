@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 2,
+  "theme": "Environment & Nature",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Past Continuous (was doing)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Environment & Nature)",
+      "target_seconds": 200
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Environment & Nature)",
+      "target_seconds": 200
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Environment & Nature)",
+      "target_seconds": 200
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Environment & Nature)",
+      "target_seconds": 200
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Environment & Nature)",
+      "target_seconds": 200
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Environment & Nature)",
+      "target_seconds": 200
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Environment & Nature)",
+      "target_seconds": 200
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of environment & nature.",
+    "Analyze the impact of environment & nature on daily life.",
+    "Compare how environment & nature differs between two countries.",
+    "Write a formal email about environment & nature.",
+    "Describe a personal experience related to environment & nature (200+ words).",
+    "What changes would you make regarding environment & nature? Explain why.",
+    "Summarize an article about environment & nature in your own words."
+  ]
+}

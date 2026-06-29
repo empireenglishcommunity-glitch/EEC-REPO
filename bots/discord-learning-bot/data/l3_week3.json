@@ -1,0 +1,54 @@
+{
+  "level": "L3",
+  "week": 3,
+  "theme": "Academic Writing",
+  "phoneme_focus": "Native rhythm + reduction patterns",
+  "grammar_pattern": "Advanced Passive (have something done)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "TED_talk",
+      "prompt": "Give a 5-minute TED-style talk (Topic: Academic Writing)",
+      "target_seconds": 270
+    },
+    "Sunday": {
+      "type": "debate_advanced",
+      "prompt": "Structured debate with rebuttals (Topic: Academic Writing)",
+      "target_seconds": 270
+    },
+    "Monday": {
+      "type": "podcast",
+      "prompt": "Record a podcast segment (5 min) (Topic: Academic Writing)",
+      "target_seconds": 270
+    },
+    "Tuesday": {
+      "type": "teaching",
+      "prompt": "Teach a concept to a beginner (Topic: Academic Writing)",
+      "target_seconds": 270
+    },
+    "Wednesday": {
+      "type": "improvisation",
+      "prompt": "Respond to unexpected prompts (Topic: Academic Writing)",
+      "target_seconds": 270
+    },
+    "Thursday": {
+      "type": "accent_mimicry",
+      "prompt": "Mimic a native speaker clip perfectly (Topic: Academic Writing)",
+      "target_seconds": 270
+    },
+    "Friday": {
+      "type": "free_mastery",
+      "prompt": "Speak naturally for 5+ minutes on any topic (Topic: Academic Writing)",
+      "target_seconds": 270
+    }
+  },
+  "writing_prompts": [
+    "Write a persuasive essay on academic writing (300+ words, use rhetorical devices).",
+    "Write a critical analysis of a trend in academic writing.",
+    "Compose a formal report with recommendations about academic writing.",
+    "Write a creative piece (story/poem) inspired by academic writing.",
+    "Draft an opinion column for a newspaper about academic writing.",
+    "Write a comparison essay using academic vocabulary about academic writing.",
+    "Write freely about academic writing — focus on style, not just content."
+  ]
+}

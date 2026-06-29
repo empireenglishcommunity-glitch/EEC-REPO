@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 12,
+  "theme": "Future & Technology",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Inversion (Not only... but also)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Future & Technology)",
+      "target_seconds": 300
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Future & Technology)",
+      "target_seconds": 300
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Future & Technology)",
+      "target_seconds": 300
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Future & Technology)",
+      "target_seconds": 300
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Future & Technology)",
+      "target_seconds": 300
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Future & Technology)",
+      "target_seconds": 300
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Future & Technology)",
+      "target_seconds": 300
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of future & technology.",
+    "Analyze the impact of future & technology on daily life.",
+    "Compare how future & technology differs between two countries.",
+    "Write a formal email about future & technology.",
+    "Describe a personal experience related to future & technology (200+ words).",
+    "What changes would you make regarding future & technology? Explain why.",
+    "Summarize an article about future & technology in your own words."
+  ]
+}

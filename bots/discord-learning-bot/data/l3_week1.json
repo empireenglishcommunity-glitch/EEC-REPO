@@ -1,0 +1,54 @@
+{
+  "level": "L3",
+  "week": 1,
+  "theme": "Idioms & Expressions",
+  "phoneme_focus": "Native rhythm + reduction patterns",
+  "grammar_pattern": "Cleft Sentences (It is... that/who)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "TED_talk",
+      "prompt": "Give a 5-minute TED-style talk (Topic: Idioms & Expressions)",
+      "target_seconds": 250
+    },
+    "Sunday": {
+      "type": "debate_advanced",
+      "prompt": "Structured debate with rebuttals (Topic: Idioms & Expressions)",
+      "target_seconds": 250
+    },
+    "Monday": {
+      "type": "podcast",
+      "prompt": "Record a podcast segment (5 min) (Topic: Idioms & Expressions)",
+      "target_seconds": 250
+    },
+    "Tuesday": {
+      "type": "teaching",
+      "prompt": "Teach a concept to a beginner (Topic: Idioms & Expressions)",
+      "target_seconds": 250
+    },
+    "Wednesday": {
+      "type": "improvisation",
+      "prompt": "Respond to unexpected prompts (Topic: Idioms & Expressions)",
+      "target_seconds": 250
+    },
+    "Thursday": {
+      "type": "accent_mimicry",
+      "prompt": "Mimic a native speaker clip perfectly (Topic: Idioms & Expressions)",
+      "target_seconds": 250
+    },
+    "Friday": {
+      "type": "free_mastery",
+      "prompt": "Speak naturally for 5+ minutes on any topic (Topic: Idioms & Expressions)",
+      "target_seconds": 250
+    }
+  },
+  "writing_prompts": [
+    "Write a persuasive essay on idioms & expressions (300+ words, use rhetorical devices).",
+    "Write a critical analysis of a trend in idioms & expressions.",
+    "Compose a formal report with recommendations about idioms & expressions.",
+    "Write a creative piece (story/poem) inspired by idioms & expressions.",
+    "Draft an opinion column for a newspaper about idioms & expressions.",
+    "Write a comparison essay using academic vocabulary about idioms & expressions.",
+    "Write freely about idioms & expressions — focus on style, not just content."
+  ]
+}

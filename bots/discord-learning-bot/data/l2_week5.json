@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 5,
+  "theme": "Science & Innovation",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Second Conditional (if I were...)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Science & Innovation)",
+      "target_seconds": 230
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Science & Innovation)",
+      "target_seconds": 230
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Science & Innovation)",
+      "target_seconds": 230
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Science & Innovation)",
+      "target_seconds": 230
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Science & Innovation)",
+      "target_seconds": 230
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Science & Innovation)",
+      "target_seconds": 230
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Science & Innovation)",
+      "target_seconds": 230
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of science & innovation.",
+    "Analyze the impact of science & innovation on daily life.",
+    "Compare how science & innovation differs between two countries.",
+    "Write a formal email about science & innovation.",
+    "Describe a personal experience related to science & innovation (200+ words).",
+    "What changes would you make regarding science & innovation? Explain why.",
+    "Summarize an article about science & innovation in your own words."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 10,
+  "theme": "Philosophy & Ethics",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Advanced Connectors (nevertheless, furthermore)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Philosophy & Ethics)",
+      "target_seconds": 280
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Philosophy & Ethics)",
+      "target_seconds": 280
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Philosophy & Ethics)",
+      "target_seconds": 280
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Philosophy & Ethics)",
+      "target_seconds": 280
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Philosophy & Ethics)",
+      "target_seconds": 280
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Philosophy & Ethics)",
+      "target_seconds": 280
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Philosophy & Ethics)",
+      "target_seconds": 280
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of philosophy & ethics.",
+    "Analyze the impact of philosophy & ethics on daily life.",
+    "Compare how philosophy & ethics differs between two countries.",
+    "Write a formal email about philosophy & ethics.",
+    "Describe a personal experience related to philosophy & ethics (200+ words).",
+    "What changes would you make regarding philosophy & ethics? Explain why.",
+    "Summarize an article about philosophy & ethics in your own words."
+  ]
+}

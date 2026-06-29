@@ -1,0 +1,54 @@
+{
+  "level": "L3",
+  "week": 6,
+  "theme": "Cultural Nuances",
+  "phoneme_focus": "Native rhythm + reduction patterns",
+  "grammar_pattern": "Discourse Markers",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "TED_talk",
+      "prompt": "Give a 5-minute TED-style talk (Topic: Cultural Nuances)",
+      "target_seconds": 300
+    },
+    "Sunday": {
+      "type": "debate_advanced",
+      "prompt": "Structured debate with rebuttals (Topic: Cultural Nuances)",
+      "target_seconds": 300
+    },
+    "Monday": {
+      "type": "podcast",
+      "prompt": "Record a podcast segment (5 min) (Topic: Cultural Nuances)",
+      "target_seconds": 300
+    },
+    "Tuesday": {
+      "type": "teaching",
+      "prompt": "Teach a concept to a beginner (Topic: Cultural Nuances)",
+      "target_seconds": 300
+    },
+    "Wednesday": {
+      "type": "improvisation",
+      "prompt": "Respond to unexpected prompts (Topic: Cultural Nuances)",
+      "target_seconds": 300
+    },
+    "Thursday": {
+      "type": "accent_mimicry",
+      "prompt": "Mimic a native speaker clip perfectly (Topic: Cultural Nuances)",
+      "target_seconds": 300
+    },
+    "Friday": {
+      "type": "free_mastery",
+      "prompt": "Speak naturally for 5+ minutes on any topic (Topic: Cultural Nuances)",
+      "target_seconds": 300
+    }
+  },
+  "writing_prompts": [
+    "Write a persuasive essay on cultural nuances (300+ words, use rhetorical devices).",
+    "Write a critical analysis of a trend in cultural nuances.",
+    "Compose a formal report with recommendations about cultural nuances.",
+    "Write a creative piece (story/poem) inspired by cultural nuances.",
+    "Draft an opinion column for a newspaper about cultural nuances.",
+    "Write a comparison essay using academic vocabulary about cultural nuances.",
+    "Write freely about cultural nuances — focus on style, not just content."
+  ]
+}

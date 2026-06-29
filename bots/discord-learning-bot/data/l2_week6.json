@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 6,
+  "theme": "Psychology & Behavior",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Relative Clauses (who/which/that)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Psychology & Behavior)",
+      "target_seconds": 240
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Psychology & Behavior)",
+      "target_seconds": 240
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Psychology & Behavior)",
+      "target_seconds": 240
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Psychology & Behavior)",
+      "target_seconds": 240
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Psychology & Behavior)",
+      "target_seconds": 240
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Psychology & Behavior)",
+      "target_seconds": 240
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Psychology & Behavior)",
+      "target_seconds": 240
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of psychology & behavior.",
+    "Analyze the impact of psychology & behavior on daily life.",
+    "Compare how psychology & behavior differs between two countries.",
+    "Write a formal email about psychology & behavior.",
+    "Describe a personal experience related to psychology & behavior (200+ words).",
+    "What changes would you make regarding psychology & behavior? Explain why.",
+    "Summarize an article about psychology & behavior in your own words."
+  ]
+}

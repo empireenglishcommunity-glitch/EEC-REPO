@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 1,
+  "theme": "Current Events & News",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Present Perfect (have done)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Current Events & News)",
+      "target_seconds": 190
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Current Events & News)",
+      "target_seconds": 190
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Current Events & News)",
+      "target_seconds": 190
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Current Events & News)",
+      "target_seconds": 190
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Current Events & News)",
+      "target_seconds": 190
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Current Events & News)",
+      "target_seconds": 190
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Current Events & News)",
+      "target_seconds": 190
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of current events & news.",
+    "Analyze the impact of current events & news on daily life.",
+    "Compare how current events & news differs between two countries.",
+    "Write a formal email about current events & news.",
+    "Describe a personal experience related to current events & news (200+ words).",
+    "What changes would you make regarding current events & news? Explain why.",
+    "Summarize an article about current events & news in your own words."
+  ]
+}

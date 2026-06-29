@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 9,
+  "theme": "Politics & Society",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Mixed Conditionals",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Politics & Society)",
+      "target_seconds": 270
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Politics & Society)",
+      "target_seconds": 270
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Politics & Society)",
+      "target_seconds": 270
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Politics & Society)",
+      "target_seconds": 270
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Politics & Society)",
+      "target_seconds": 270
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Politics & Society)",
+      "target_seconds": 270
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Politics & Society)",
+      "target_seconds": 270
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of politics & society.",
+    "Analyze the impact of politics & society on daily life.",
+    "Compare how politics & society differs between two countries.",
+    "Write a formal email about politics & society.",
+    "Describe a personal experience related to politics & society (200+ words).",
+    "What changes would you make regarding politics & society? Explain why.",
+    "Summarize an article about politics & society in your own words."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 4,
+  "theme": "Business & Economy",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Passive Voice (it was done)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Business & Economy)",
+      "target_seconds": 220
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Business & Economy)",
+      "target_seconds": 220
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Business & Economy)",
+      "target_seconds": 220
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Business & Economy)",
+      "target_seconds": 220
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Business & Economy)",
+      "target_seconds": 220
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Business & Economy)",
+      "target_seconds": 220
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Business & Economy)",
+      "target_seconds": 220
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of business & economy.",
+    "Analyze the impact of business & economy on daily life.",
+    "Compare how business & economy differs between two countries.",
+    "Write a formal email about business & economy.",
+    "Describe a personal experience related to business & economy (200+ words).",
+    "What changes would you make regarding business & economy? Explain why.",
+    "Summarize an article about business & economy in your own words."
+  ]
+}

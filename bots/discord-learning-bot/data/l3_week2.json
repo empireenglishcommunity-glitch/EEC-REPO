@@ -1,0 +1,54 @@
+{
+  "level": "L3",
+  "week": 2,
+  "theme": "Humor & Sarcasm",
+  "phoneme_focus": "Native rhythm + reduction patterns",
+  "grammar_pattern": "Subjunctive (I suggest he go)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "TED_talk",
+      "prompt": "Give a 5-minute TED-style talk (Topic: Humor & Sarcasm)",
+      "target_seconds": 260
+    },
+    "Sunday": {
+      "type": "debate_advanced",
+      "prompt": "Structured debate with rebuttals (Topic: Humor & Sarcasm)",
+      "target_seconds": 260
+    },
+    "Monday": {
+      "type": "podcast",
+      "prompt": "Record a podcast segment (5 min) (Topic: Humor & Sarcasm)",
+      "target_seconds": 260
+    },
+    "Tuesday": {
+      "type": "teaching",
+      "prompt": "Teach a concept to a beginner (Topic: Humor & Sarcasm)",
+      "target_seconds": 260
+    },
+    "Wednesday": {
+      "type": "improvisation",
+      "prompt": "Respond to unexpected prompts (Topic: Humor & Sarcasm)",
+      "target_seconds": 260
+    },
+    "Thursday": {
+      "type": "accent_mimicry",
+      "prompt": "Mimic a native speaker clip perfectly (Topic: Humor & Sarcasm)",
+      "target_seconds": 260
+    },
+    "Friday": {
+      "type": "free_mastery",
+      "prompt": "Speak naturally for 5+ minutes on any topic (Topic: Humor & Sarcasm)",
+      "target_seconds": 260
+    }
+  },
+  "writing_prompts": [
+    "Write a persuasive essay on humor & sarcasm (300+ words, use rhetorical devices).",
+    "Write a critical analysis of a trend in humor & sarcasm.",
+    "Compose a formal report with recommendations about humor & sarcasm.",
+    "Write a creative piece (story/poem) inspired by humor & sarcasm.",
+    "Draft an opinion column for a newspaper about humor & sarcasm.",
+    "Write a comparison essay using academic vocabulary about humor & sarcasm.",
+    "Write freely about humor & sarcasm — focus on style, not just content."
+  ]
+}

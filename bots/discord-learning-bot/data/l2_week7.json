@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 7,
+  "theme": "Travel & Adventure",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Third Conditional (if I had done...)",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Travel & Adventure)",
+      "target_seconds": 250
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Travel & Adventure)",
+      "target_seconds": 250
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Travel & Adventure)",
+      "target_seconds": 250
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Travel & Adventure)",
+      "target_seconds": 250
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Travel & Adventure)",
+      "target_seconds": 250
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Travel & Adventure)",
+      "target_seconds": 250
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Travel & Adventure)",
+      "target_seconds": 250
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of travel & adventure.",
+    "Analyze the impact of travel & adventure on daily life.",
+    "Compare how travel & adventure differs between two countries.",
+    "Write a formal email about travel & adventure.",
+    "Describe a personal experience related to travel & adventure (200+ words).",
+    "What changes would you make regarding travel & adventure? Explain why.",
+    "Summarize an article about travel & adventure in your own words."
+  ]
+}

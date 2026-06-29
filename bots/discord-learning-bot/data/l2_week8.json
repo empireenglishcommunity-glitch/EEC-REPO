@@ -1,0 +1,54 @@
+{
+  "level": "L2",
+  "week": 8,
+  "theme": "Art & Creativity",
+  "phoneme_focus": "Connected speech + intonation",
+  "grammar_pattern": "Wish/If only",
+  "vocabulary": [],
+  "speaking_missions": {
+    "Saturday": {
+      "type": "debate",
+      "prompt": "Argue for or against a position (Topic: Art & Creativity)",
+      "target_seconds": 260
+    },
+    "Sunday": {
+      "type": "presentation",
+      "prompt": "Give a 3-minute presentation (Topic: Art & Creativity)",
+      "target_seconds": 260
+    },
+    "Monday": {
+      "type": "analysis",
+      "prompt": "Analyze a situation or problem (Topic: Art & Creativity)",
+      "target_seconds": 260
+    },
+    "Tuesday": {
+      "type": "storytelling",
+      "prompt": "Tell a detailed story with emotions (Topic: Art & Creativity)",
+      "target_seconds": 260
+    },
+    "Wednesday": {
+      "type": "interview",
+      "prompt": "Answer interview-style questions (Topic: Art & Creativity)",
+      "target_seconds": 260
+    },
+    "Thursday": {
+      "type": "summary",
+      "prompt": "Summarize an article or video (Topic: Art & Creativity)",
+      "target_seconds": 260
+    },
+    "Friday": {
+      "type": "free_discussion",
+      "prompt": "Discuss any topic for 4 minutes (Topic: Art & Creativity)",
+      "target_seconds": 260
+    }
+  },
+  "writing_prompts": [
+    "Write an essay (150+ words) arguing for or against an aspect of art & creativity.",
+    "Analyze the impact of art & creativity on daily life.",
+    "Compare how art & creativity differs between two countries.",
+    "Write a formal email about art & creativity.",
+    "Describe a personal experience related to art & creativity (200+ words).",
+    "What changes would you make regarding art & creativity? Explain why.",
+    "Summarize an article about art & creativity in your own words."
+  ]
+}
