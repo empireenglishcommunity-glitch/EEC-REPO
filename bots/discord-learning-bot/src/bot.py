@@ -131,6 +131,8 @@ async def on_ready():
         weekly_leaderboard_post.start()
     if not at_risk_check.is_running():
         at_risk_check.start()
+    if not missed_day_report.is_running():
+        missed_day_report.start()
 
 
 @bot.event
@@ -416,6 +418,14 @@ async def at_risk_check():
     guild = bot.get_guild(config.GUILD_ID)
     if guild:
         await features.check_at_risk_members(guild)
+
+
+@tasks.loop(time=datetime.time(hour=8, minute=0, tzinfo=_zone()))
+async def missed_day_report():
+    """Post missed-day reminders every morning."""
+    guild = bot.get_guild(config.GUILD_ID)
+    if guild:
+        await features.post_missed_day_reminders(guild)
 
 
 
@@ -706,6 +716,12 @@ async def cmd_help(ctx):
         "`!setlevel @user L0/L1/L2/L3` — Set someone's level\n"
         "`!announce <message>` — Broadcast announcement\n"
         "`!members` — List all members\n"
+        "`!orient <date/time>` — Send orientation invite\n"
+        "`!recruit ar/en` — Get recruitment message template\n"
+        "`!resources L0/L1/L2/L3` — Post shadowing resources\n\n"
+        "**Account:**\n"
+        "`!delete` — Request deletion of all your data\n"
+        "`!exam` — Request level advancement exam\n"
     )
 
 
@@ -812,6 +828,18 @@ async def cmd_exam(ctx):
     await features.handle_exam_request(ctx, bot)
 
 
+@bot.command(name="delete")
+async def cmd_delete(ctx):
+    """Request deletion of all your data."""
+    await features.handle_delete_request(ctx, bot)
+
+
+@bot.command(name="confirm-delete")
+async def cmd_confirm_delete(ctx):
+    """Confirm data deletion."""
+    await features.handle_confirm_delete(ctx, bot)
+
+
 # ============================================================
 #  ADMIN COMMANDS
 # ============================================================
@@ -904,6 +932,52 @@ async def cmd_members(ctx):
     except discord.Forbidden:
         await ctx.send("\n".join(lines))
 
+
+
+# ============================================================
+#  ADMIN: ORIENTATION & RECRUITMENT
+# ============================================================
+
+@bot.command(name="orient")
+@commands.has_permissions(manage_guild=True)
+async def cmd_orient(ctx, *, date_time: str = ""):
+    """Send orientation invite to all members. Usage: !orient Saturday 7PM"""
+    if not date_time:
+        await ctx.send("Usage: `!orient Saturday 7PM Dubai time`")
+        return
+    guild = ctx.guild
+    sent = await features.send_orientation_invite(guild, date_time)
+    await ctx.author.send(f"📩 Orientation invite sent to {sent} members for: {date_time}")
+    await ctx.send("📩 Done.", delete_after=5)
+
+
+@bot.command(name="recruit")
+@commands.has_permissions(manage_guild=True)
+async def cmd_recruit(ctx, lang: str = "ar"):
+    """Show recruitment message template. Usage: !recruit ar / !recruit en"""
+    if lang == "en":
+        msg = features.RECRUITMENT_MESSAGE_EN
+    else:
+        msg = features.RECRUITMENT_MESSAGE_AR
+    await ctx.author.send(f"📋 **Recruitment Template ({lang}):**\n\n{msg}")
+    await ctx.send("📩 Template sent to your DMs.", delete_after=5)
+
+
+@bot.command(name="resources")
+@commands.has_permissions(manage_guild=True)
+async def cmd_resources(ctx, level: str = "L0"):
+    """Post shadowing resources for a level. Usage: !resources L0"""
+    level = level.upper()
+    if level not in ["L0", "L1", "L2", "L3"]:
+        await ctx.send("Usage: `!resources L0/L1/L2/L3`")
+        return
+    msg = features.format_shadowing_resources(level)
+    channel = discord.utils.get(ctx.guild.text_channels, name="cheat-sheets")
+    if channel:
+        await channel.send(msg)
+        await ctx.send(f"📩 Resources posted in #cheat-sheets for {level}", delete_after=5)
+    else:
+        await ctx.send(msg)
 
 
 # ============================================================

@@ -535,3 +535,266 @@ async def check_at_risk_members(guild: discord.Guild):
                         )
                     except:
                         pass
+
+
+
+# ============================================================
+#  13. DATA DELETION (!delete command)
+# ============================================================
+
+async def handle_delete_request(ctx, bot):
+    """Handle !delete command — confirm and delete all member data."""
+    member = database.get_member(str(ctx.author.id))
+    if not member:
+        await ctx.send("You're not registered. Nothing to delete.")
+        return
+
+    # Send confirmation
+    await ctx.send(
+        f"⚠️ **طلب حذف بيانات**\n\n"
+        f"ده هيحذف كل بياناتك:\n"
+        f"• النقاط والمستوى\n"
+        f"• الاستمرارية (streak)\n"
+        f"• كل التقديمات السابقة\n"
+        f"• تقييماتك الأسبوعية\n\n"
+        f"**لتأكيد الحذف اكتب:** `!confirm-delete`\n"
+        f"*الحذف نهائي ومش ممكن يتراجع عنه.*"
+    )
+
+
+async def handle_confirm_delete(ctx, bot):
+    """Actually delete all member data after confirmation."""
+    discord_id = str(ctx.author.id)
+    member = database.get_member(discord_id)
+    if not member:
+        await ctx.send("Nothing to delete.")
+        return
+
+    # Delete from database
+    from . import config
+    import sqlite3
+    conn = sqlite3.connect(str(config.DB_PATH))
+    conn.execute("DELETE FROM daily_submissions WHERE discord_id=?", (discord_id,))
+    conn.execute("DELETE FROM streaks WHERE discord_id=?", (discord_id,))
+    conn.execute("DELETE FROM assessments WHERE discord_id=?", (discord_id,))
+    conn.execute("DELETE FROM advancement_exams WHERE discord_id=?", (discord_id,))
+    conn.execute("DELETE FROM points_log WHERE discord_id=?", (discord_id,))
+    conn.execute("DELETE FROM members WHERE discord_id=?", (discord_id,))
+    conn.commit()
+    conn.close()
+
+    # Remove level role
+    if isinstance(ctx.author, discord.Member):
+        for role in ctx.author.roles:
+            if "Level" in role.name:
+                try:
+                    await ctx.author.remove_roles(role)
+                except:
+                    pass
+
+    await ctx.send(
+        f"✅ **تم حذف كل بياناتك بنجاح.**\n"
+        f"لو حبيت ترجع في أي وقت: `!join`"
+    )
+    logger.info(f"Data deleted for {ctx.author.display_name} ({discord_id})")
+
+
+# ============================================================
+#  14. MISSED DAY REPORT AUTOMATION
+# ============================================================
+
+async def post_missed_day_reminders(guild: discord.Guild):
+    """Post gentle reminders in #missed-day-report for members who missed yesterday."""
+    from . import tasks as task_engine
+    import datetime as dt
+
+    yesterday = (dt.date.today() - dt.timedelta(days=1)).isoformat()
+    channel = discord.utils.get(guild.text_channels, name="daily-check-in")
+    if not channel:
+        return
+
+    members = database.all_active_members()
+    missed = []
+    for m in members:
+        count = database.count_submissions_for_date(m["discord_id"], yesterday)
+        if count == 0:
+            missed.append(m)
+
+    if not missed:
+        return
+
+    # Post a gentle group reminder (not individual shaming)
+    names = ", ".join(m["discord_name"] for m in missed[:10])
+    msg = (
+        f"📋 **أمس — {len(missed)} members missed tasks**\n\n"
+        f"لو فاتك يوم مفيش مشكلة — المهم ترجع النهاردة.\n"
+        f"حتى مهمة واحدة بتحافظ على الزخم. 💪\n\n"
+        f"*Every day is a new chance. Come back stronger.*"
+    )
+    try:
+        await channel.send(msg)
+    except:
+        pass
+
+
+# ============================================================
+#  15. ORIENTATION SESSION TEMPLATE (auto-DM when scheduled)
+# ============================================================
+
+ORIENTATION_TEMPLATE = """🏛️ **جلسة التعريف — Empire English Community**
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📅 **الموعد:** {date_time}
+🔊 **المكان:** Voice channel `l0-voice-1`
+⏱️ **المدة:** 30 دقيقة
+
+**جدول الجلسة:**
+1. (5 min) ترحيب + تعارف
+2. (10 min) شرح النظام (7 مهام يومية + المستويات)
+3. (5 min) عرض عملي: إزاي تستخدم البوت
+4. (5 min) أسئلة
+5. (5 min) تحديد الهدف الشخصي
+
+**جهّز قبل الجلسة:**
+• اكتب `!join <هدفك>` في #bot-commands
+• حمّل Discord على الموبايل (لو مش محمّله)
+• جهّز سماعة/مايك
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*حضور الجلسة إلزامي لكل عضو جديد.*
+"""
+
+
+async def send_orientation_invite(guild: discord.Guild, date_time_str: str):
+    """Send orientation session invite to all members who haven't attended yet."""
+    members = database.all_active_members()
+    sent = 0
+    for m in members:
+        discord_member = guild.get_member(int(m["discord_id"]))
+        if not discord_member:
+            continue
+        try:
+            await discord_member.send(ORIENTATION_TEMPLATE.format(date_time=date_time_str))
+            sent += 1
+        except discord.Forbidden:
+            pass
+    logger.info(f"Orientation invite sent to {sent} members")
+    return sent
+
+
+# ============================================================
+#  16. RECRUITMENT MESSAGE TEMPLATE
+# ============================================================
+
+RECRUITMENT_MESSAGE_AR = """مرحبًا! 👋
+
+بنبني نظام تعلم إنجليزي جديد — مش كورس عادي.
+نظام يومي كامل مع مجتمع ونطق أمريكي من اليوم الأول.
+
+🎯 محتاج 10 أشخاص فقط يجربونه مجانًا لمدة 8 أسابيع.
+
+**في المقابل:**
+• تلتزم بـ 45-60 دقيقة يوميًا
+• تديني رأيك الصريح أسبوعيًا
+• تسجّل تقدمك
+
+**اللي هتحصل عليه:**
+• نظام يومي مصمم لمستواك (7 مهام/يوم)
+• تدريب نطق أمريكي من البداية
+• مجتمع يدعمك + متابعة شخصية
+• تقييم أسبوعي + خطة مخصصة
+• AI يصحح كتابتك ونطقك فورًا
+
+مجاني بالكامل. 10 مقاعد فقط.
+مهتم؟ ابعتلي "أنا" 🏛️"""
+
+RECRUITMENT_MESSAGE_EN = """Hey! 👋
+
+We're building a new English learning system — not a course.
+A daily system with community and American accent from day one.
+
+🎯 Looking for 10 people to try it FREE for 8 weeks.
+
+**In return:**
+• Commit 45-60 min/day
+• Give honest weekly feedback
+• Track your progress
+
+**You get:**
+• Daily system designed for your level (7 tasks/day)
+• American accent training from day 1
+• Supportive community + personal follow-up
+• Weekly assessment + personalized plan
+• AI corrects your writing and pronunciation instantly
+
+Completely free. 10 spots only.
+Interested? Reply "I'm in" 🏛️"""
+
+
+# ============================================================
+#  17. SPACED REPETITION IN DAILY TASKS
+# ============================================================
+
+def get_review_section_for_daily_post(level: str, week: int, day_index: int) -> str:
+    """Generate a 'Review Corner' section for the daily task post.
+    Includes 3-5 words from previous weeks for review.
+    """
+    review_words = get_spaced_repetition_words("placeholder_id", count=4)
+    if not review_words:
+        # Fallback: use curriculum directly
+        from . import curriculum
+        prev_week = max(1, week - 1)
+        all_prev = curriculum.get_vocabulary_for_week(prev_week, level)
+        if all_prev:
+            review_words = random.sample(all_prev, min(4, len(all_prev)))
+
+    if not review_words:
+        return ""
+
+    lines = ["", "🔄 **Review Corner** (من الأسابيع السابقة):", ""]
+    for w in review_words:
+        if isinstance(w, dict):
+            lines.append(f"  • **{w.get('word', '')}** — {w.get('arabic', '')} — Use it in a sentence!")
+        elif isinstance(w, tuple):
+            lines.append(f"  • **{w[0]}** — {w[1]} — Use it in a sentence!")
+
+    return "\n".join(lines)
+
+
+# ============================================================
+#  18. SHADOWING & LISTENING RESOURCE LINKS
+# ============================================================
+
+SHADOWING_RESOURCES = {
+    "L0": [
+        {"title": "BBC Learning English - 6 Minute English", "url": "https://www.bbc.co.uk/learningenglish/english/features/6-minute-english", "speed": "slow"},
+        {"title": "English with Lucy - Pronunciation", "url": "https://www.youtube.com/@EnglishwithLucy", "speed": "slow-medium"},
+        {"title": "Rachel's English - American Pronunciation", "url": "https://www.youtube.com/@rachelsenglish", "speed": "slow"},
+    ],
+    "L1": [
+        {"title": "TED-Ed - Short educational videos", "url": "https://www.youtube.com/@TEDEd", "speed": "medium"},
+        {"title": "VOA Learning English", "url": "https://learningenglish.voanews.com/", "speed": "slow-medium"},
+        {"title": "English Addict with Mr Duncan", "url": "https://www.youtube.com/@EnglishAddict", "speed": "medium"},
+    ],
+    "L2": [
+        {"title": "TED Talks", "url": "https://www.ted.com/talks", "speed": "natural"},
+        {"title": "NPR Podcasts", "url": "https://www.npr.org/podcasts", "speed": "natural"},
+        {"title": "BBC World Service", "url": "https://www.bbc.co.uk/worldserviceradio", "speed": "natural"},
+    ],
+    "L3": [
+        {"title": "The Daily (NYT Podcast)", "url": "https://www.nytimes.com/column/the-daily", "speed": "fast-natural"},
+        {"title": "Freakonomics Radio", "url": "https://freakonomics.com/podcast/", "speed": "fast"},
+        {"title": "Joe Rogan / Lex Fridman clips", "url": "https://www.youtube.com/@lexfridman", "speed": "fast-natural"},
+    ],
+}
+
+
+def format_shadowing_resources(level: str) -> str:
+    """Format shadowing resource recommendations for a level."""
+    resources = SHADOWING_RESOURCES.get(level, SHADOWING_RESOURCES["L0"])
+    lines = [f"🎧 **Shadowing Resources — {level}**\n"]
+    for r in resources:
+        lines.append(f"• [{r['title']}]({r['url']}) — Speed: {r['speed']}")
+    lines.append("\n*Pick any clip (30-60 sec). Listen → Shadow 3x → Record #3.*")
+    return "\n".join(lines)
