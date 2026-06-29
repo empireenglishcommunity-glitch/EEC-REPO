@@ -1,0 +1,537 @@
+"""Empire English Community Bot — Additional Features Module.
+
+Implements remaining blueprint items:
+1. Gradual task intro (3→5→7 for new members)
+2. Privacy notice content
+3. Weekly feedback survey (Friday DM)
+4. Spaced repetition (review words in quiz)
+5. Weekly progress report (Monday DM)
+6. Grammar Pattern Card delivery (Day 4 of week)
+7. Advancement exam flow
+8. Buddy system
+9. English-only detection
+10. Streak tracker auto-post
+11. Leaderboard auto-post
+12. At-risk member outreach
+"""
+import datetime
+import logging
+import random
+import re
+
+import discord
+
+from . import config, database, curriculum
+
+logger = logging.getLogger("empire-bot.features")
+
+
+# ============================================================
+#  1. GRADUAL TASK INTRO
+# ============================================================
+
+def get_allowed_tasks_for_member(discord_id: str) -> list[str]:
+    """Determine how many tasks a new member should do based on days since joining.
+    Day 1-3: 3 tasks (accent, vocab, community)
+    Day 4-7: 5 tasks (+ speaking, writing)
+    Week 2+: all 7 tasks
+    """
+    member = database.get_member(discord_id)
+    if not member:
+        return [t["id"] for t in config.DAILY_TASKS]
+
+    joined = datetime.datetime.fromisoformat(member["joined_at"])
+    days_since = (datetime.datetime.now() - joined).days
+
+    all_tasks = [t["id"] for t in config.DAILY_TASKS]
+
+    if days_since < 3:
+        return ["accent", "vocab", "community"]
+    elif days_since < 7:
+        return ["accent", "vocab", "speaking", "writing", "community"]
+    else:
+        return all_tasks
+
+
+# ============================================================
+#  2. PRIVACY NOTICE
+# ============================================================
+
+PRIVACY_NOTICE = """🏛️ **سياسة الخصوصية — Empire English Community**
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**ما البيانات اللي بنجمعها:**
+• اسم المستخدم على Discord
+• التسجيلات الصوتية اللي بترفعها (للتقييم)
+• النصوص اللي بتكتبها (للتصحيح)
+• نقاطك واستمراريتك ومستواك
+
+**ليه بنجمعها:**
+• عشان نتابع تقدمك
+• عشان AI يقدر يديك feedback
+• عشان نحسن النظام
+
+**فين بتتخزن:**
+• قاعدة بيانات مشفرة على سيرفر خاص
+• التسجيلات بتتحذف بعد 12 شهر من آخر نشاط
+
+**حقوقك:**
+• تقدر تطلب حذف كل بياناتك في أي وقت
+• ابعت رسالة في `#support` وهنحذفها خلال 7 أيام
+• تقدر تطلب نسخة من بياناتك
+
+**الحد الأدنى للعمر:** 16 سنة
+
+**موافقة التسجيل الصوتي:**
+بمجرد رفعك تسجيل صوتي في أي قناة، انت موافق إن AI يحلله ويديك feedback.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**Privacy Policy Summary (English):**
+We collect: username, voice recordings (for evaluation), text submissions (for correction), points/streaks/level data.
+Purpose: track progress, deliver AI feedback, improve the system.
+Storage: encrypted database, recordings deleted after 12 months of inactivity.
+Your rights: request deletion anytime via #support (7-day processing).
+Minimum age: 16.
+By uploading voice recordings, you consent to AI analysis.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*Empire English Community — Common Sense First.* 🏛️"""
+
+
+# ============================================================
+#  3. WEEKLY FEEDBACK SURVEY (Friday DM)
+# ============================================================
+
+FEEDBACK_QUESTIONS = [
+    "1️⃣ قيّم المهام اليومية هذا الأسبوع (1-10):\nHow useful were this week's tasks? (1-10)",
+    "2️⃣ إيه أصعب حاجة واجهتك؟\nWhat was the hardest part this week?",
+    "3️⃣ إيه اللي تحب تتغير؟\nWhat would you change?",
+]
+
+
+async def send_weekly_feedback_survey(guild: discord.Guild):
+    """Send 3-question feedback survey to all active members (Friday evening)."""
+    members = database.all_active_members()
+    sent = 0
+    for m in members:
+        discord_member = guild.get_member(int(m["discord_id"]))
+        if not discord_member:
+            continue
+        try:
+            await discord_member.send(
+                f"📋 **استبيان أسبوعي — Empire English**\n\n"
+                f"رأيك مهم! جاوب على الـ 3 أسئلة دول:\n\n" +
+                "\n\n".join(FEEDBACK_QUESTIONS) +
+                "\n\n*ابعت إجاباتك هنا (reply to this DM)*"
+            )
+            sent += 1
+        except discord.Forbidden:
+            pass
+    logger.info(f"Feedback survey sent to {sent} members")
+
+
+# ============================================================
+#  4. SPACED REPETITION (enhanced quiz)
+# ============================================================
+
+def get_spaced_repetition_words(discord_id: str, count: int = 5) -> list[dict]:
+    """Get words from previous weeks for review (spaced repetition).
+    Returns words from week-1, week-2, and week-3 for review.
+    """
+    member = database.get_member(discord_id)
+    if not member:
+        return []
+    week = database.member_week_number(discord_id)
+    review_words = []
+    for prev_week in range(max(1, week - 3), week):
+        words = curriculum.get_vocabulary_for_week(prev_week)
+        if words:
+            review_words.extend(random.sample(words, min(3, len(words))))
+    return review_words[:count]
+
+
+# ============================================================
+#  5. WEEKLY PROGRESS REPORT (Monday DM)
+# ============================================================
+
+async def send_weekly_progress_report(guild: discord.Guild):
+    """Send personalized progress report to each member (Monday morning)."""
+    from . import tasks as task_engine
+
+    members = database.all_active_members()
+    sent = 0
+    for m in members:
+        discord_member = guild.get_member(int(m["discord_id"]))
+        if not discord_member:
+            continue
+
+        completion = task_engine.calculate_completion_rate(m["discord_id"])
+        current_streak, longest = database.get_streak(m["discord_id"])
+        week = database.member_week_number(m["discord_id"])
+        latest = database.get_latest_assessment(m["discord_id"])
+
+        # Build visual bars
+        comp_bar = "█" * int(completion / 10) + "░" * (10 - int(completion / 10))
+
+        msg = (
+            f"📊 **تقرير الأسبوع — Week {week}**\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"📈 نسبة الإنجاز: [{comp_bar}] **{completion}%**\n"
+            f"🔥 Streak: **{current_streak}** يوم (أطول: {longest})\n"
+            f"🏆 النقاط: **{m['total_points']}**\n"
+        )
+
+        if latest:
+            msg += f"📝 آخر تقييم: **{latest['overall_score']:.0f}%** ({latest.get('rating', '')})\n"
+
+        # Encouragement based on performance
+        if completion >= 80:
+            msg += "\n🌟 أداء ممتاز! استمر كده."
+        elif completion >= 60:
+            msg += "\n💪 كويس! حاول تزود شوية الأسبوع الجاي."
+        elif completion >= 40:
+            msg += "\n⚠️ محتاج تلتزم أكتر. حتى مهمة واحدة يوميًا أحسن من لا شيء."
+        else:
+            msg += "\n❗ الأسبوع ده كان ضعيف. هل محتاج مساعدة؟ كلمنا في #support"
+
+        msg += "\n\n*النظام بيشتغل لما انت تشتغل. 🏛️*"
+
+        try:
+            await discord_member.send(msg)
+            sent += 1
+        except discord.Forbidden:
+            pass
+
+    logger.info(f"Weekly progress reports sent to {sent} members")
+
+
+# ============================================================
+#  6. GRAMMAR PATTERN CARD (Day 4 of each week)
+# ============================================================
+
+def format_grammar_card(week: int) -> str:
+    """Format the grammar pattern card for posting in #cheat-sheets."""
+    grammar = curriculum.get_grammar_pattern(week)
+    if not grammar:
+        return ""
+
+    lines = [
+        f"📖 **Grammar Pattern — Week {week}**",
+        f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        f"",
+        f"**{grammar.get('pattern_name', '')}**",
+        f"*{grammar.get('pattern_name_ar', '')}*",
+        f"",
+        f"**Formula:** `{grammar.get('formula', '')}`",
+        f"**Visual:** `{grammar.get('formula_visual', '')}`",
+        f"",
+        f"**When to use:**",
+        f"{grammar.get('when_to_use', '')}",
+        f"",
+        f"**بالعربي:**",
+        f"{grammar.get('when_to_use_ar', '')}",
+        f"",
+    ]
+
+    examples = grammar.get("examples", [])
+    if examples:
+        lines.append("**Examples:**")
+        for ex in examples[:5]:
+            lines.append(f"  • {ex}")
+        lines.append("")
+
+    common_errors = grammar.get("common_errors", [])
+    if common_errors:
+        lines.append("**Common mistake (Arabic speakers):**")
+        if isinstance(common_errors, list):
+            for err in common_errors[:2]:
+                if isinstance(err, dict):
+                    lines.append(f"  ❌ {err.get('wrong', '')}")
+                    lines.append(f"  ✅ {err.get('correct', '')}")
+                else:
+                    lines.append(f"  ⚠️ {err}")
+        lines.append("")
+
+    practice = grammar.get("practice_fill_blank", [])
+    if practice:
+        lines.append("**Practice (fill the blank):**")
+        for p in practice[:3]:
+            lines.append(f"  {p}")
+        lines.append("")
+
+    quick_rule = grammar.get("quick_rule", "")
+    if quick_rule:
+        lines.append(f"💡 **Quick rule:** {quick_rule}")
+        quick_ar = grammar.get("quick_rule_ar", "")
+        if quick_ar:
+            lines.append(f"💡 **بالعربي:** {quick_ar}")
+
+    return "\n".join(lines)
+
+
+# ============================================================
+#  7. ADVANCEMENT EXAM (!exam command)
+# ============================================================
+
+async def handle_exam_request(ctx, bot):
+    """Handle !exam command — check eligibility and start exam flow."""
+    member = database.get_member(str(ctx.author.id))
+    if not member:
+        await ctx.send("Not registered. Use `!join` first.")
+        return
+
+    level = member["level"]
+    level_info = config.LEVELS.get(level, config.LEVELS["L0"])
+    week = database.member_week_number(str(ctx.author.id))
+
+    # Check minimum week requirement
+    min_weeks = level_info.get("duration_weeks")
+    if min_weeks and week < min_weeks[0]:
+        await ctx.send(
+            f"⏳ لسه مش جاهز للامتحان.\n"
+            f"المستوى {level} يحتاج على الأقل **{min_weeks[0]} أسابيع**.\n"
+            f"انت في الأسبوع {week}. استمر!"
+        )
+        return
+
+    # Check last attempt (max 1 per month)
+    last_attempt = database.last_advancement_attempt(str(ctx.author.id))
+    if last_attempt:
+        last_date = datetime.datetime.fromisoformat(last_attempt["attempted_at"])
+        days_since = (datetime.datetime.now() - last_date).days
+        if days_since < 30:
+            await ctx.send(
+                f"⏳ آخر محاولة كانت من {days_since} يوم.\n"
+                f"تقدر تحاول تاني بعد **{30 - days_since}** يوم."
+            )
+            return
+
+    # Eligible — send exam instructions via DM
+    next_level = {"L0": "L1", "L1": "L2", "L2": "L3"}.get(level)
+    if not next_level:
+        await ctx.send("👑 انت في أعلى مستوى بالفعل! مستوى 3 هو مستوى الإتقان.")
+        return
+
+    try:
+        await ctx.author.send(
+            f"📋 **امتحان الترقية: {level} → {next_level}**\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"الامتحان من 5 أقسام (60 دقيقة):\n\n"
+            f"1️⃣ **Speaking** (10 min) — سجل 60 ثانية بدون تحضير\n"
+            f"2️⃣ **Listening** (15 min) — 15 سؤال\n"
+            f"3️⃣ **Vocabulary** (10 min) — 50 كلمة\n"
+            f"4️⃣ **Accent** (5 min) — اقرأ passage + كلام حر\n"
+            f"5️⃣ **Writing** (20 min) — اكتب فقرة\n\n"
+            f"الحد الأدنى: **{level_info.get('advancement_score', 70)}%** في كل قسم\n\n"
+            f"⚠️ الامتحان هيكون مع المؤسس في voice call.\n"
+            f"ابعت رسالة في `#support` لتحديد الموعد.\n\n"
+            f"*Good luck! 🏛️*"
+        )
+        await ctx.send("📩 تفاصيل الامتحان اتبعتلك في DM.")
+    except discord.Forbidden:
+        await ctx.send("❌ مقدرش أبعتلك DM. افتح الرسائل الخاصة.")
+
+
+# ============================================================
+#  8. BUDDY SYSTEM
+# ============================================================
+
+async def assign_buddy(new_member: discord.Member, guild: discord.Guild):
+    """Assign an onboarding buddy to a new member.
+    For pilot: founder is the buddy. At scale: L1+ members.
+    """
+    # Find the founder
+    founder_role = discord.utils.get(guild.roles, name="🏛️ Founder")
+    if founder_role and founder_role.members:
+        buddy = founder_role.members[0]
+        # Notify buddy
+        try:
+            await buddy.send(
+                f"👋 عضو جديد انضم: **{new_member.display_name}**\n"
+                f"انت الـ buddy بتاعه. تواصل معاه خلال 12 ساعة."
+            )
+        except discord.Forbidden:
+            pass
+        # Store in database
+        database.update_member(str(new_member.id), buddy_id=str(buddy.id))
+        logger.info(f"Assigned buddy {buddy.display_name} to {new_member.display_name}")
+
+
+# ============================================================
+#  9. ENGLISH-ONLY DETECTION
+# ============================================================
+
+# Arabic Unicode range
+_ARABIC_PATTERN = re.compile(r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]{3,}')
+
+# Channels where Arabic is allowed
+ARABIC_ALLOWED_CHANNELS = {"l0-questions", "support", "دليل-القنوات"}
+
+
+async def check_english_only(message: discord.Message) -> bool:
+    """Check if message contains Arabic in English-only channels.
+    Returns True if a warning was sent (message violated rule).
+    """
+    if message.author.bot:
+        return False
+
+    channel_name = message.channel.name
+    if channel_name in ARABIC_ALLOWED_CHANNELS:
+        return False
+
+    # Only enforce in text practice and community channels
+    enforce_channels = {
+        "general-chat", "introductions", "daily-word", "events",
+        "l0-text-practice", "l1-text-practice", "l2-text-practice", "l3-text-practice",
+    }
+    if channel_name not in enforce_channels:
+        return False
+
+    # Check for Arabic text (more than 3 consecutive Arabic chars)
+    if _ARABIC_PATTERN.search(message.content):
+        # Check member's level for enforcement level
+        member = database.get_member(str(message.author.id))
+        level = member.get("level", "L0") if member else "L0"
+        week = database.member_week_number(str(message.author.id)) if member else 1
+
+        # L0 weeks 1-4: gentle reminder only
+        if level == "L0" and week <= 4:
+            try:
+                await message.reply(
+                    f"💡 English only in this channel! Try in English:\n"
+                    f"*You can ask Arabic questions in `#l0-questions`*",
+                    delete_after=30,
+                )
+            except:
+                pass
+            return True
+        else:
+            # Stronger enforcement for L0 week 5+ and higher levels
+            try:
+                await message.reply(
+                    f"⚠️ **English only!** This channel is English-only.\n"
+                    f"*Arabic questions → `#l0-questions` or `#support`*",
+                    delete_after=30,
+                )
+            except:
+                pass
+            return True
+
+    return False
+
+
+# ============================================================
+#  10. STREAK TRACKER AUTO-POST
+# ============================================================
+
+async def post_streak_tracker(guild: discord.Guild):
+    """Post daily streak summary to #streak-tracker."""
+    channel = discord.utils.get(guild.text_channels, name="streak-tracker")
+    if not channel:
+        return
+
+    members = database.all_active_members()
+    if not members:
+        return
+
+    # Sort by streak (descending)
+    members.sort(key=lambda m: m["current_streak"], reverse=True)
+    active_streaks = [m for m in members if m["current_streak"] > 0]
+
+    if not active_streaks:
+        return
+
+    lines = [
+        f"🔥 **Streak Tracker** — {datetime.date.today().strftime('%d %b')}",
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        "",
+    ]
+    for m in active_streaks[:15]:
+        fire = "🔥" * min(5, m["current_streak"] // 7 + 1)
+        lines.append(f"{fire} **{m['discord_name']}** — {m['current_streak']} days")
+
+    lines.append(f"\n*{len(active_streaks)} members with active streaks*")
+
+    try:
+        await channel.send("\n".join(lines))
+    except:
+        pass
+
+
+# ============================================================
+#  11. LEADERBOARD AUTO-POST
+# ============================================================
+
+async def post_leaderboard(guild: discord.Guild):
+    """Post weekly leaderboard to #leaderboard."""
+    channel = discord.utils.get(guild.text_channels, name="leaderboard")
+    if not channel:
+        return
+
+    rows = database.leaderboard(10)
+    if not rows:
+        return
+
+    medals = ["🥇", "🥈", "🥉"] + ["🔹"] * 7
+    lines = [
+        f"🏆 **Weekly Leaderboard** — {datetime.date.today().strftime('%d %b')}",
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        "",
+    ]
+    for i, row in enumerate(rows):
+        lvl = config.LEVELS.get(row["level"], config.LEVELS["L0"])
+        lines.append(f"{medals[i]} **{row['discord_name']}** — {row['total_points']} pts {lvl['emoji']}")
+
+    try:
+        await channel.send("\n".join(lines))
+    except:
+        pass
+
+
+# ============================================================
+#  12. AT-RISK MEMBER OUTREACH
+# ============================================================
+
+async def check_at_risk_members(guild: discord.Guild):
+    """Check weekly assessment scores and trigger outreach for at-risk members."""
+    members = database.all_active_members()
+    for m in members:
+        latest = database.get_latest_assessment(m["discord_id"])
+        if not latest:
+            continue
+
+        score = latest.get("overall_score", 100)
+        if score and score < 70:
+            # At-risk: send supportive message
+            discord_member = guild.get_member(int(m["discord_id"]))
+            if not discord_member:
+                continue
+
+            buddy_id = m.get("buddy_id", "")
+            try:
+                await discord_member.send(
+                    f"👋 مرحبًا {m['discord_name']}!\n\n"
+                    f"لاحظنا إن آخر تقييم كان **{score:.0f}%**.\n"
+                    f"ده مش مشكلة — كلنا بنمر بأوقات صعبة.\n\n"
+                    f"💡 **اقتراحات:**\n"
+                    f"• ركز على المهام اللي بتستمتع بيها\n"
+                    f"• حتى 3 مهام يوميًا أحسن من لا شيء\n"
+                    f"• ادخل voice lounge — الممارسة مع الناس بتفرق\n\n"
+                    f"محتاج مساعدة؟ كلمنا في `#support` 🏛️"
+                )
+            except discord.Forbidden:
+                pass
+
+            # Notify buddy if assigned
+            if buddy_id:
+                buddy = guild.get_member(int(buddy_id))
+                if buddy:
+                    try:
+                        await buddy.send(
+                            f"⚠️ {m['discord_name']} at-risk (score: {score:.0f}%). "
+                            f"Please check in with them."
+                        )
+                    except:
+                        pass

@@ -32,7 +32,7 @@ import logging
 import discord
 from discord.ext import commands, tasks
 
-from . import config, database, tasks as task_engine, ai_engine, verification
+from . import config, database, tasks as task_engine, ai_engine, verification, features
 
 logging.basicConfig(
     level=getattr(logging, config.LOG_LEVEL, logging.INFO),
@@ -119,12 +119,26 @@ async def on_ready():
         weekly_assessment.start()
     if not streak_update.is_running():
         streak_update.start()
+    if not friday_feedback_survey.is_running():
+        friday_feedback_survey.start()
+    if not monday_progress_report.is_running():
+        monday_progress_report.start()
+    if not grammar_card_delivery.is_running():
+        grammar_card_delivery.start()
+    if not daily_streak_post.is_running():
+        daily_streak_post.start()
+    if not weekly_leaderboard_post.is_running():
+        weekly_leaderboard_post.start()
+    if not at_risk_check.is_running():
+        at_risk_check.start()
 
 
 @bot.event
 async def on_member_join(member: discord.Member):
     """Auto-register new members and send welcome DM with full manual."""
     database.register_member(str(member.id), member.display_name)
+    # Assign buddy
+    await features.assign_buddy(member, member.guild)
     try:
         # Message 1: Welcome + First Steps
         await member.send(
@@ -330,6 +344,80 @@ def _now():
         return datetime.datetime.now(datetime.timezone.utc)
 
 
+# --- Additional Scheduled Tasks (from blueprint Phase 4-6) ---
+
+@tasks.loop(time=datetime.time(hour=20, minute=0, tzinfo=_zone()))
+async def friday_feedback_survey():
+    """Send weekly feedback survey every Friday evening."""
+    if _now().weekday() != 4:  # 4 = Friday
+        return
+    guild = bot.get_guild(config.GUILD_ID)
+    if guild:
+        await features.send_weekly_feedback_survey(guild)
+
+
+@tasks.loop(time=datetime.time(hour=7, minute=0, tzinfo=_zone()))
+async def monday_progress_report():
+    """Send weekly progress report every Monday morning."""
+    if _now().weekday() != 0:  # 0 = Monday
+        return
+    guild = bot.get_guild(config.GUILD_ID)
+    if guild:
+        await features.send_weekly_progress_report(guild)
+
+
+@tasks.loop(time=datetime.time(hour=config.DAILY_TASK_HOUR, minute=30, tzinfo=_zone()))
+async def grammar_card_delivery():
+    """Post grammar pattern card on Day 4 of each week (Wednesday)."""
+    if _now().weekday() != 2:  # 2 = Wednesday
+        return
+    guild = bot.get_guild(config.GUILD_ID)
+    if not guild:
+        return
+
+    # Get current week and post grammar card
+    members = database.members_at_level("L0")
+    if members:
+        week = database.member_week_number(members[0]["discord_id"])
+        card = features.format_grammar_card(week)
+        if card:
+            channel = discord.utils.get(guild.text_channels, name="cheat-sheets")
+            if channel:
+                try:
+                    await channel.send(card)
+                    logger.info(f"Grammar card posted for week {week}")
+                except:
+                    pass
+
+
+@tasks.loop(time=datetime.time(hour=22, minute=0, tzinfo=_zone()))
+async def daily_streak_post():
+    """Post streak tracker summary every evening."""
+    guild = bot.get_guild(config.GUILD_ID)
+    if guild:
+        await features.post_streak_tracker(guild)
+
+
+@tasks.loop(time=datetime.time(hour=7, minute=30, tzinfo=_zone()))
+async def weekly_leaderboard_post():
+    """Post leaderboard every Sunday morning."""
+    if _now().weekday() != 6:  # 6 = Sunday
+        return
+    guild = bot.get_guild(config.GUILD_ID)
+    if guild:
+        await features.post_leaderboard(guild)
+
+
+@tasks.loop(time=datetime.time(hour=9, minute=0, tzinfo=_zone()))
+async def at_risk_check():
+    """Check for at-risk members every Monday."""
+    if _now().weekday() != 0:  # 0 = Monday
+        return
+    guild = bot.get_guild(config.GUILD_ID)
+    if guild:
+        await features.check_at_risk_members(guild)
+
+
 
 # ============================================================
 #  MEMBER COMMANDS
@@ -373,6 +461,20 @@ async def cmd_done(ctx, task: str = None):
     task = task.lower().strip()
     if task not in valid_tasks:
         await ctx.send(f"❌ Unknown task. Valid: {', '.join(f'`{t}`' for t in valid_tasks)}")
+        return
+
+    # GRADUAL INTRO: Check if this task is unlocked for new members
+    allowed = features.get_allowed_tasks_for_member(str(ctx.author.id))
+    if task not in allowed:
+        member = database.get_member(str(ctx.author.id))
+        joined = datetime.datetime.fromisoformat(member["joined_at"]) if member else datetime.datetime.now()
+        days = (datetime.datetime.now() - joined).days
+        await ctx.send(
+            f"🔒 مهمة `{task}` مش متاحة لسه.\n"
+            f"انت في اليوم {days + 1}. المهام المتاحة ليك:\n"
+            f"{', '.join(f'`{t}`' for t in allowed)}\n\n"
+            f"*الـ 7 مهام هتكون متاحة من الأسبوع التاني.*"
+        )
         return
 
     # Check if already done today
@@ -614,10 +716,13 @@ async def cmd_help(ctx):
 
 @bot.event
 async def on_message(message: discord.Message):
-    """Detect writing submissions, auto-evaluate, and handle quiz answers."""
+    """Detect writing submissions, auto-evaluate, handle quiz answers, and enforce English-only."""
     # Don't respond to bot's own messages
     if message.author.bot:
         return
+
+    # English-only detection (before processing commands)
+    await features.check_english_only(message)
 
     # Process commands first
     await bot.process_commands(message)
@@ -695,6 +800,16 @@ async def on_message(message: discord.Message):
                 f"🎯 Focus: {result.get('one_thing_to_practice', '')}"
             )
             await message.reply(feedback_msg)
+
+
+# ============================================================
+#  ADVANCEMENT EXAM
+# ============================================================
+
+@bot.command(name="exam")
+async def cmd_exam(ctx):
+    """Request the level advancement exam."""
+    await features.handle_exam_request(ctx, bot)
 
 
 # ============================================================
