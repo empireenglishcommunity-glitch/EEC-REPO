@@ -32,7 +32,7 @@ import logging
 import discord
 from discord.ext import commands, tasks
 
-from . import config, database, tasks as task_engine, ai_engine
+from . import config, database, tasks as task_engine, ai_engine, verification
 
 logging.basicConfig(
     level=getattr(logging, config.LOG_LEVEL, logging.INFO),
@@ -136,23 +136,19 @@ async def on_member_join(member: discord.Member):
         )
         await asyncio.sleep(2)
 
-        # Message 2: Daily Tasks + Commands
+        # Message 2: Daily Tasks + Commands (with verification info)
         await member.send(
             f"📅 **الروتين اليومي (7 مهام — 45 دقيقة بس):**\n\n"
-            f"🎯 تدريب النطق — `!done accent`\n"
-            f"📖 مفردات جديدة — `!done vocab`\n"
-            f"🎧 المحاكاة (Shadowing) — `!done shadow`\n"
-            f"🎙️ مهمة الكلام — `!done speaking`\n"
-            f"👂 تمرين الاستماع — `!done listening`\n"
-            f"✍️ تمرين الكتابة — `!done writing`\n"
-            f"💬 مشاركة مجتمعية — `!done community`\n\n"
+            f"🎯 تدريب النطق — سجل صوتك في `#l0-showcase` ← ثم `!done accent`\n"
+            f"📖 مفردات جديدة — `!done vocab` ← البوت هيسألك سؤال\n"
+            f"🎧 المحاكاة (Shadowing) — سجل 30 ثانية في `#l0-showcase` ← ثم `!done shadow`\n"
+            f"🎙️ مهمة الكلام — سجل صوتك في `#l0-showcase` ← ثم `!done speaking`\n"
+            f"👂 تمرين الاستماع — `!done listening` ← البوت هيسألك سؤال\n"
+            f"✍️ تمرين الكتابة — اكتب في `#l0-text-practice` ← ثم `!done writing`\n"
+            f"💬 مشاركة مجتمعية — اكتب في `#general-chat` أو ادخل voice 10 دقايق ← ثم `!done community`\n\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-            f"📋 **أوامر مهمة:**\n"
-            f"`!progress` — تقدمك ونقاطك\n"
-            f"`!streak` — الاستمرارية\n"
-            f"`!level` — مستواك الحالي\n"
-            f"`!top` — لوحة المتصدرين\n"
-            f"`!help` — كل الأوامر"
+            f"⚠️ **مهم:** لازم تعمل المهمة الأول وبعدين تكتب `!done`\n"
+            f"البوت بيتأكد إنك فعلاً عملت المهمة قبل ما يديك النقاط."
         )
         await asyncio.sleep(2)
 
@@ -207,6 +203,20 @@ async def on_command_error(ctx, error):
         return
     logger.error(f"Command error in !{ctx.command}: {error}")
     await ctx.send("⚠️ An error occurred. Please try again or contact a moderator.")
+
+
+@bot.event
+async def on_voice_state_update(member, before, after):
+    """Track voice channel time for community task verification."""
+    if member.bot:
+        return
+    # Joined a voice channel
+    if before.channel is None and after.channel is not None:
+        verification.on_voice_join(str(member.id))
+    # Left a voice channel
+    elif before.channel is not None and after.channel is None:
+        verification.on_voice_leave(str(member.id))
+
 
 
 
@@ -339,7 +349,7 @@ async def cmd_join(ctx, *, goal: str = ""):
 
 @bot.command(name="done")
 async def cmd_done(ctx, task: str = None):
-    """Mark a task as completed. Usage: !done accent / !done speaking / etc."""
+    """Mark a task as completed (with verification). Usage: !done accent / !done speaking / etc."""
     valid_tasks = [t["id"] for t in config.DAILY_TASKS]
 
     if not task:
@@ -360,6 +370,42 @@ async def cmd_done(ctx, task: str = None):
         await ctx.send(f"❌ Unknown task. Valid: {', '.join(f'`{t}`' for t in valid_tasks)}")
         return
 
+    # Check if already done today
+    completed_today = database.tasks_completed_today(str(ctx.author.id))
+    if task in completed_today:
+        await ctx.send(f"✅ You already submitted `{task}` today. Keep going!")
+        return
+
+    # TIME GATE: 5 min cooldown between !done commands
+    allowed, remaining_secs = verification.check_cooldown(str(ctx.author.id))
+    if not allowed:
+        mins = remaining_secs // 60
+        secs = remaining_secs % 60
+        await ctx.send(f"⏳ استنى {mins}:{secs:02d} قبل ما تسجل مهمة تانية.\n(5 دقايق بين كل `!done`)")
+        return
+
+    # VOCAB: Two-step quiz flow
+    if task == "vocab":
+        question, answer, word = verification.generate_vocab_quiz(str(ctx.author.id))
+        await ctx.send(f"📖 **اختبار مفردات:**\n\n{question}\n\n*اكتب إجابتك هنا:*")
+        return  # Answer handled in on_message
+
+    # LISTENING: Two-step quiz flow
+    if task == "listening":
+        prompt, answer = verification.generate_listening_quiz(str(ctx.author.id))
+        await ctx.send(prompt)
+        return  # Answer handled in on_message
+
+    # OTHER TASKS: Verify proof exists
+    if isinstance(ctx.author, discord.Member):
+        passed, error_msg = await verification.verify_task(task, ctx.author, ctx.guild)
+        if not passed:
+            await ctx.send(f"❌ **لم يتم التحقق:**\n\n{error_msg}")
+            return
+
+    # PASSED VERIFICATION — process the submission
+    verification.record_done_time(str(ctx.author.id))
+
     result = await task_engine.process_submission(
         str(ctx.author.id), ctx.author.display_name, task
     )
@@ -369,9 +415,6 @@ async def cmd_done(ctx, task: str = None):
         return
 
     # Format response
-    level_info = config.LEVELS.get(
-        (database.get_member(str(ctx.author.id)) or {}).get("level", "L0"), config.LEVELS["L0"]
-    )
     bar = "█" * result["tasks_today"] + "░" * (7 - result["tasks_today"])
     msg = (
         f"{result['feedback']}\n\n"
@@ -535,13 +578,22 @@ async def cmd_help(ctx):
         "**🏛️ Empire English Bot — Commands**\n\n"
         "**Learning:**\n"
         "`!join <goal>` — Register and set your goal\n"
-        "`!done <task>` — Mark a task done (accent/vocab/shadow/speaking/listening/writing/community)\n"
+        "`!done <task>` — Mark a task done (with verification)\n"
         "`!progress` — Your full progress dashboard\n"
         "`!streak` — Your streak details\n"
         "`!level` — Your level info and advancement requirements\n"
         "`!week` — This week's curriculum focus\n"
         "`!top` — Points leaderboard\n"
         "`!streaks` — Streak leaderboard\n\n"
+        "**How `!done` works (verification):**\n"
+        "🎯 `!done accent` — upload audio in #showcase first\n"
+        "📖 `!done vocab` — bot asks you a word quiz\n"
+        "🎧 `!done shadow` — upload 30s+ audio in #showcase first\n"
+        "🎙️ `!done speaking` — upload audio in #showcase first\n"
+        "👂 `!done listening` — bot asks a comprehension question\n"
+        "✍️ `!done writing` — write in #text-practice first (20+ chars)\n"
+        "💬 `!done community` — post in #general-chat or 10min voice\n"
+        "⏳ 5 min cooldown between each `!done`\n\n"
         "**Admin:**\n"
         "`!status` — Bot status\n"
         "`!setlevel @user L0/L1/L2/L3` — Set someone's level\n"
@@ -557,13 +609,52 @@ async def cmd_help(ctx):
 
 @bot.event
 async def on_message(message: discord.Message):
-    """Detect writing submissions and auto-evaluate."""
+    """Detect writing submissions, auto-evaluate, and handle quiz answers."""
     # Don't respond to bot's own messages
     if message.author.bot:
         return
 
     # Process commands first
     await bot.process_commands(message)
+
+    # Handle pending VOCAB quiz answers
+    if verification.has_pending_quiz(str(message.author.id)):
+        if message.channel.name == "bot-commands" and not message.content.startswith("!"):
+            passed, error_msg = verification.check_vocab_answer(str(message.author.id), message.content)
+            if passed:
+                # Process the vocab submission
+                verification.record_done_time(str(message.author.id))
+                result = await task_engine.process_submission(
+                    str(message.author.id), message.author.display_name, "vocab"
+                )
+                bar = "█" * result["tasks_today"] + "░" * (7 - result["tasks_today"])
+                await message.channel.send(
+                    f"✅ **صح!** أحسنت {message.author.mention}!\n\n"
+                    f"[{bar}] {result['tasks_today']}/7 today\n"
+                    f"🔥 Streak: **{result['streak']}** days | +{result['points']} points"
+                )
+            else:
+                await message.channel.send(f"{message.author.mention} {error_msg}")
+            return
+
+    # Handle pending LISTENING quiz answers
+    if verification.has_pending_listening(str(message.author.id)):
+        if message.channel.name == "bot-commands" and not message.content.startswith("!"):
+            passed, error_msg = verification.check_listening_answer(str(message.author.id), message.content)
+            if passed:
+                verification.record_done_time(str(message.author.id))
+                result = await task_engine.process_submission(
+                    str(message.author.id), message.author.display_name, "listening"
+                )
+                bar = "█" * result["tasks_today"] + "░" * (7 - result["tasks_today"])
+                await message.channel.send(
+                    f"✅ **صح!** أحسنت {message.author.mention}!\n\n"
+                    f"[{bar}] {result['tasks_today']}/7 today\n"
+                    f"🔥 Streak: **{result['streak']}** days | +{result['points']} points"
+                )
+            else:
+                await message.channel.send(f"{message.author.mention} {error_msg}")
+            return
 
     # Auto-evaluate writing in #writing-feedback channel
     if message.channel.name == "writing-feedback" and len(message.content) > 30:
